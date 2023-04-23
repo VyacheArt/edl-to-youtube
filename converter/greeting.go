@@ -6,6 +6,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	. "github.com/VyacheArt/edl-to-youtube/converter/locale"
 	"strings"
 )
 
@@ -34,12 +35,15 @@ func (w *GreetingWindow) Show() {
 }
 
 func (w *GreetingWindow) getContent() fyne.CanvasObject {
-	const greetingText = "Welcome to %s!\n\nPlease choose EDL file to make YouTube captions:"
+	const (
+		greetingTextKey = "greetingMessage"
+		chooseFileKey   = "chooseFile"
+	)
 
 	chooseFileContainer := container.New(layout.NewCenterLayout(),
 		container.New(layout.NewVBoxLayout(),
-			widget.NewLabel(fmt.Sprintf(greetingText, Title)),
-			widget.NewButton("Choose file", func() {
+			widget.NewLabel(fmt.Sprintf(Localize(greetingTextKey), Title)),
+			widget.NewButton(Localize(chooseFileKey), func() {
 				if ChooseFile(w.app, w.window) {
 					w.window.Close()
 				}

@@ -1,0 +1,9 @@
+greetingMessage = "Welcome to %s!\n\nPlease choose EDL file to make YouTube captions:"
+welcomeScreen = "Welcome screen"
+
+language = "Language"
+chooseFile = "Choose file"
+file = "File"
+open = "Open"
+openLast = "Open last"
+quit = "Quit"

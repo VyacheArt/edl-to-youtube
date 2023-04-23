@@ -2,7 +2,6 @@ package caption
 
 import (
 	"github.com/VyacheArt/edl-to-youtube/edl"
-	"strconv"
 	"strings"
 )
 
@@ -32,11 +31,10 @@ func (g *Generator) Generate(cfg Config, list *edl.List) string {
 
 	builder := strings.Builder{}
 
-	for i, clip := range list.Clips {
+	for _, clip := range list.Clips {
 		builder.WriteString(clip.RecordIn.Time.Format(timeFormat))
 		builder.WriteString(" ")
-		builder.WriteString("Section ")
-		builder.WriteString(strconv.Itoa(i + 1))
+		builder.WriteString(clip.Marker)
 		builder.WriteString("\n")
 	}
 

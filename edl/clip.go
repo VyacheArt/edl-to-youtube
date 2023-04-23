@@ -24,6 +24,8 @@ type (
 		SourceOut   Timecode
 		RecordIn    Timecode
 		RecordOut   Timecode
+		Color       string
+		Marker      string
 	}
 
 	Transition string
@@ -87,6 +89,21 @@ func (c *Clip) parseHeader(headerLine string) error {
 }
 
 func (c *Clip) parseMeta(s string) error {
-	//TODO: implement
+	parts := strings.Split(s, "|")
+	pairs := map[string]func(string){
+		"C:": func(s string) { c.Color = s },
+		"M:": func(s string) { c.Marker = s },
+	}
+
+partLoop:
+	for _, part := range parts {
+		for key, set := range pairs {
+			if strings.HasPrefix(part, key) {
+				set(strings.TrimSpace(strings.TrimPrefix(part, key)))
+				continue partLoop
+			}
+		}
+	}
+
 	return nil
 }

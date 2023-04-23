@@ -9,6 +9,7 @@ import (
 	"github.com/VyacheArt/edl-to-youtube/caption"
 	"github.com/VyacheArt/edl-to-youtube/edl"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -19,10 +20,12 @@ const (
 	//sourceOutIndex
 	recordInIndex
 	//recordOutIndex
+	colorIndex
+	markerIndex
 )
 
 type ViewerWindow struct {
-	app     fyne.App
+	app     *Application
 	window  fyne.Window
 	edlList *edl.List
 
@@ -32,7 +35,7 @@ type ViewerWindow struct {
 	generator       *caption.Generator
 }
 
-func NewViewerWindow(app fyne.App, edlList *edl.List) *ViewerWindow {
+func NewViewerWindow(app *Application, edlList *edl.List) *ViewerWindow {
 	return &ViewerWindow{
 		app:             app,
 		edlList:         edlList,
@@ -44,7 +47,7 @@ func NewViewerWindow(app fyne.App, edlList *edl.List) *ViewerWindow {
 }
 
 func (w *ViewerWindow) Show() {
-	w.window = w.app.NewWindow(w.edlList.Title)
+	w.window = w.app.getApp().NewWindow(w.edlList.Title)
 	w.window.Resize(fyne.NewSize(900, 600))
 	w.window.CenterOnScreen()
 
@@ -57,6 +60,7 @@ func (w *ViewerWindow) Show() {
 
 func (w *ViewerWindow) getContent() fyne.CanvasObject {
 	captionEntry := widget.NewMultiLineEntry()
+	captionEntry.TextStyle.Monospace = true
 	captionEntry.Bind(w.caption)
 
 	content := container.NewHSplit(
@@ -102,7 +106,7 @@ func (w *ViewerWindow) getRefreshButton() *widget.Button {
 func (w *ViewerWindow) getTable() *widget.Table {
 	table := widget.NewTable(
 		func() (int, int) {
-			return len(w.edlList.Clips) + 1, 2
+			return len(w.edlList.Clips) + 1, 4
 		},
 		func() fyne.CanvasObject {
 			return widget.NewLabel("........................")
@@ -124,6 +128,12 @@ func (w *ViewerWindow) getTable() *widget.Table {
 
 			case recordInIndex:
 				text = clip.RecordIn.String()
+
+			case colorIndex:
+				text = colorLabel(clip.Color)
+
+			case markerIndex:
+				text = clip.Marker
 			}
 
 			label.TextStyle.Bold = false
@@ -141,6 +151,12 @@ func (w *ViewerWindow) getColumnTitles(index int) string {
 
 	case recordInIndex:
 		return "Timecode"
+
+	case colorIndex:
+		return "Color"
+
+	case markerIndex:
+		return "Marker"
 	}
 
 	return ""
@@ -168,4 +184,10 @@ func frameCodeModeLabel(mode edl.FrameCodeMode) string {
 	default:
 		return "Unknown (" + string(mode) + ")"
 	}
+}
+
+func colorLabel(rawColor string) string {
+	//TODO: check adobe premiere color names
+	color := strings.TrimPrefix(rawColor, "ResolveColor")
+	return color
 }

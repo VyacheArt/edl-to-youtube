@@ -9,7 +9,7 @@ import (
 
 func EnableProgress(c fyne.Canvas, op func(), text string) {
 	content := c.Content()
-	c.SetContent(GetProgressView(text))
+	c.SetContent(widget.NewModalPopUp(GetProgressView(text), c))
 
 	op()
 

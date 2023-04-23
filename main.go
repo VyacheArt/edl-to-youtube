@@ -1,21 +1,24 @@
 package main
 
-import (
-	"fmt"
-	"github.com/VyacheArt/edl-to-youtube/edl"
-	"os"
-)
+import "github.com/VyacheArt/edl-to-youtube/converter"
+
+//func main() {
+//	edlContent, err := os.ReadFile("example.edl")
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	edlList, err := edl.Parse(string(edlContent))
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	fmt.Printf("%+v", edlList)
+//}
 
 func main() {
-	edlContent, err := os.ReadFile("example.edl")
-	if err != nil {
+	a := converter.NewApplication()
+	if err := a.Run(); err != nil {
 		panic(err)
 	}
-
-	edlList, err := edl.Parse(string(edlContent))
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("%+v", edlList)
 }

@@ -10,8 +10,10 @@ import (
 	"github.com/VyacheArt/edl-to-youtube/edl"
 	"strconv"
 	"strings"
+	"time"
 )
 
+// column indexes. Order is important and could be changed right here
 const (
 	clipNumberIndex = iota
 	//trackNumberIndex
@@ -72,10 +74,13 @@ func (w *ViewerWindow) getContent() fyne.CanvasObject {
 	captionEntry.Bind(w.caption)
 
 	content := container.NewHSplit(
+		//left part with form and clips list
 		container.NewVSplit(
 			container.NewPadded(w.getForm()),
 			w.getTable(),
 		),
+
+		//right part with generated caption
 		container.NewBorder(nil,
 			container.NewBorder(
 				nil, nil, nil,
@@ -117,11 +122,21 @@ func (w *ViewerWindow) getForm() *widget.Form {
 }
 
 func (w *ViewerWindow) getCopyButton() *widget.Button {
+	const (
+		copyButtonText = "Copy"
+		textCopied     = "Copied!"
+	)
+
 	var copyButton *widget.Button
-	copyButton = widget.NewButton("Copy", func() {
+	copyButton = widget.NewButton(copyButtonText, func() {
 		text, _ := w.caption.Get()
 		w.window.Clipboard().SetContent(text)
-		copyButton.SetText("Copied!")
+		copyButton.SetText(textCopied)
+
+		go func() {
+			<-time.After(1 * time.Second)
+			copyButton.SetText(copyButtonText)
+		}()
 	})
 
 	return copyButton
@@ -174,6 +189,7 @@ func (w *ViewerWindow) getTable() *widget.Table {
 	return table
 }
 
+// getColumnTitles returns title for column which will be rendered as a first row in the table
 func (w *ViewerWindow) getColumnTitles(index int) string {
 	switch index {
 	case clipNumberIndex:

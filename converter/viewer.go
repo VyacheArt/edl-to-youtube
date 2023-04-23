@@ -61,11 +61,11 @@ func (w *ViewerWindow) getContent() fyne.CanvasObject {
 
 	content := container.NewHSplit(
 		container.NewVSplit(
-			widget.NewForm(
+			container.NewPadded(widget.NewForm(
 				widget.NewFormItem("Title", widget.NewLabel(w.edlList.Title)),
 				widget.NewFormItem("Frame Code Mode", widget.NewLabel(frameCodeModeLabel(w.edlList.FrameCodeMode))),
 				widget.NewFormItem("Timecode Format", widget.NewEntryWithData(w.bindString(&w.generatorConfig.TimeFormat))),
-			),
+			)),
 			w.getTable(),
 		),
 		container.NewBorder(nil,

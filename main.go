@@ -3,7 +3,7 @@ package main
 import "github.com/VyacheArt/edl-to-youtube/converter"
 
 //func main() {
-//	edlContent, err := os.ReadFile("example.edl")
+//	edlContent, err := os.ReadFile("/Users/vyacheart/Downloads/Timeline 1.edl")
 //	if err != nil {
 //		panic(err)
 //	}

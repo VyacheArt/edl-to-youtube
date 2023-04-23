@@ -37,3 +37,7 @@ func (t *Timecode) Parse(s string) error {
 
 	return nil
 }
+
+func (t *Timecode) String() string {
+	return t.Time.Format("15:04:05") + ":" + fmt.Sprintf("%02d", t.Frame)
+}

@@ -18,6 +18,7 @@ func (a *Application) Run() error {
 	a.app = app.New()
 
 	NewGreetingWindow(a.app).Show()
+	a.app.Run()
 
 	return nil
 }

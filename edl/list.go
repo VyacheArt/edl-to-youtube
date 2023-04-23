@@ -1,6 +1,7 @@
 package edl
 
 import (
+	"errors"
 	"strings"
 )
 
@@ -22,9 +23,10 @@ type (
 	FrameCodeMode string
 )
 
+var ErrEmptyList = errors.New("empty decision list")
+
 func Parse(s string) (*List, error) {
 	l := List{}
-
 	if err := l.Parse(s); err != nil {
 		return nil, err
 	}
@@ -73,6 +75,10 @@ func (l *List) Parse(s string) error {
 		l.Clips = append(l.Clips, clip)
 	}
 
+	if l.IsEmpty() {
+		return ErrEmptyList
+	}
+
 	return nil
 }
 
@@ -102,4 +108,8 @@ func (l *List) parseFrameCodeMode(line string) bool {
 	}
 
 	return true
+}
+
+func (l *List) IsEmpty() bool {
+	return len(l.Title) == 0 && len(l.FrameCodeMode) == 0 && len(l.Clips) == 0
 }

@@ -42,7 +42,7 @@ func (c *Clip) Parse(s string) error {
 
 func (c *Clip) parseHeader(headerLine string) error {
 	re := regexp.MustCompile(`\s{2,}`)
-	normalizedHeaderLine := re.ReplaceAllString(headerLine, " ")
+	normalizedHeaderLine := strings.TrimSpace(re.ReplaceAllString(headerLine, " "))
 
 	//Clip is in the format of
 	//001 V C        00:00:00:00 00:00:00:00 00:00:00:00 00:00:00:00

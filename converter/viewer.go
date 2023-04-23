@@ -47,9 +47,9 @@ func (w *ViewerWindow) Show() {
 	w.window = w.app.NewWindow(w.edlList.Title)
 	w.window.Resize(fyne.NewSize(900, 600))
 	w.window.CenterOnScreen()
-	w.window.SetMaster()
 
 	w.window.SetContent(w.getContent())
+	w.window.SetMainMenu(GetMainMenu(w.app, w.window))
 	w.window.Show()
 
 	w.regenerate()

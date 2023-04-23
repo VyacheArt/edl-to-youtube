@@ -35,6 +35,7 @@ func (w *GreetingWindow) Show() {
 	w.window.CenterOnScreen()
 
 	w.window.SetContent(w.getContent())
+	w.window.SetMainMenu(GetMainMenu(w.app, w.window))
 	w.window.Show()
 }
 
@@ -42,20 +43,9 @@ func (w *GreetingWindow) getContent() fyne.CanvasObject {
 	content := container.New(layout.NewCenterLayout(),
 		container.New(layout.NewVBoxLayout(),
 			widget.NewButton("Choose file", func() {
-				EnableProgress(w.window.Canvas(), func() {
-					path, _ := zenity.SelectFile(zenity.FileFilters{
-						{
-							Name:     "All files",
-							Patterns: []string{"*"},
-						},
-						{
-							Name:     "EDL files",
-							Patterns: []string{"edl"},
-						},
-					}, zenity.Modal())
-
-					w.onChooseFile(path)
-				}, "Choose EDL file")
+				if ChooseFile(w.app, w.window) {
+					w.window.Close()
+				}
 			}),
 		),
 	)
@@ -63,40 +53,56 @@ func (w *GreetingWindow) getContent() fyne.CanvasObject {
 	return content
 }
 
-func (w *GreetingWindow) onChooseFile(path string) {
+func ChooseFile(app fyne.App, window fyne.Window) bool {
+	var path string
+	EnableProgress(window.Canvas(), func() {
+		path, _ = zenity.SelectFile(zenity.FileFilters{
+			{
+				Name:     "All files",
+				Patterns: []string{"*"},
+			},
+			{
+				Name:     "EDL files",
+				Patterns: []string{"edl"},
+			},
+		}, zenity.Modal())
+	}, "Choose EDL file")
+
+	return OpenFile(app, window, path)
+}
+
+func OpenFile(app fyne.App, window fyne.Window, path string) bool {
 	if len(path) == 0 {
-		return
+		return false
 	}
 
 	log.Printf("File chosen, path: %s", path)
 
 	//get file size
 	if info, _ := os.Stat(path); info.Size() > MaxFileSize {
-		dialog.ShowError(fmt.Errorf("file size is too big, max size is %d bytes", MaxFileSize), w.window)
-		return
+		dialog.ShowError(fmt.Errorf("file size is too big, max size is %d bytes", MaxFileSize), window)
+		return false
 	}
 
 	content, err := os.ReadFile(path)
 	if err != nil {
-		dialog.ShowError(err, w.window)
-		return
+		dialog.ShowError(err, window)
+		return false
 	}
 
 	edlList, err := edl.Parse(string(content))
 	if err != nil {
-		dialog.ShowError(err, w.window)
-		return
+		dialog.ShowError(err, window)
+		return false
 	}
 
 	if len(edlList.Clips) == 0 {
-		dialog.ShowError(errors.New("no clips found in the EDL file"), w.window)
-		return
+		dialog.ShowError(errors.New("no clips found in the EDL file"), window)
+		return false
 	}
 
-	w.window.Hide()
-
-	viewer := NewViewerWindow(w.app, edlList)
+	viewer := NewViewerWindow(app, edlList)
 	viewer.Show()
 
-	w.window.Close()
+	return true
 }

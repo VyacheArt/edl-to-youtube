@@ -208,10 +208,7 @@ func (w *ViewerWindow) getColumnTitles(index int) string {
 	return ""
 }
 
-func (w *ViewerWindow) regenerate() {
-	_ = w.caption.Set(w.generator.Generate(w.generatorConfig, w.edlList))
-}
-
+// bindString is needed to make sure that caption will be regenerated when some field is changed
 func (w *ViewerWindow) bindString(v *string) binding.ExternalString {
 	b := binding.BindString(v)
 	b.AddListener(binding.NewDataListener(func() {
@@ -221,13 +218,8 @@ func (w *ViewerWindow) bindString(v *string) binding.ExternalString {
 	return b
 }
 
-func (w *ViewerWindow) bindBool(v *bool) binding.ExternalBool {
-	b := binding.BindBool(v)
-	b.AddListener(binding.NewDataListener(func() {
-		w.regenerate()
-	}))
-
-	return b
+func (w *ViewerWindow) regenerate() {
+	_ = w.caption.Set(w.generator.Generate(w.generatorConfig, w.edlList))
 }
 
 func frameCodeModeLabel(mode edl.FrameCodeMode) string {

@@ -8,6 +8,7 @@ import (
 type (
 	Config struct {
 		TimeFormat string
+		Colors     map[string]bool
 	}
 
 	Generator struct{}
@@ -16,6 +17,7 @@ type (
 func DefaultConfig() Config {
 	return Config{
 		TimeFormat: "15:04:05",
+		Colors:     make(map[string]bool),
 	}
 }
 
@@ -32,6 +34,10 @@ func (g *Generator) Generate(cfg Config, list *edl.List) string {
 	builder := strings.Builder{}
 
 	for _, clip := range list.Clips {
+		if enabled, ok := cfg.Colors[clip.Color]; !ok || !enabled {
+			continue
+		}
+
 		builder.WriteString(clip.RecordIn.Time.Format(timeFormat))
 		builder.WriteString(" ")
 		builder.WriteString(clip.Marker)

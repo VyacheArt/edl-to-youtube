@@ -36,13 +36,21 @@ type ViewerWindow struct {
 }
 
 func NewViewerWindow(app *Application, edlList *edl.List) *ViewerWindow {
-	return &ViewerWindow{
+	window := &ViewerWindow{
 		app:             app,
 		edlList:         edlList,
 		generator:       caption.NewGenerator(),
 		generatorConfig: caption.DefaultConfig(),
+		caption:         binding.NewString(),
+	}
 
-		caption: binding.NewString(),
+	window.fillColors()
+	return window
+}
+
+func (w *ViewerWindow) fillColors() {
+	for _, clip := range w.edlList.Clips {
+		w.generatorConfig.Colors[clip.Color] = true
 	}
 }
 
@@ -65,11 +73,7 @@ func (w *ViewerWindow) getContent() fyne.CanvasObject {
 
 	content := container.NewHSplit(
 		container.NewVSplit(
-			container.NewPadded(widget.NewForm(
-				widget.NewFormItem("Title", widget.NewLabel(w.edlList.Title)),
-				widget.NewFormItem("Frame Code Mode", widget.NewLabel(frameCodeModeLabel(w.edlList.FrameCodeMode))),
-				widget.NewFormItem("Timecode Format", widget.NewEntryWithData(w.bindString(&w.generatorConfig.TimeFormat))),
-			)),
+			container.NewPadded(w.getForm()),
 			w.getTable(),
 		),
 		container.NewBorder(nil,
@@ -84,6 +88,32 @@ func (w *ViewerWindow) getContent() fyne.CanvasObject {
 	content.SetOffset(0.7)
 
 	return content
+}
+
+func (w *ViewerWindow) getForm() *widget.Form {
+	colorFormItems := make([]*widget.FormItem, 0, len(w.generatorConfig.Colors))
+	for c := range w.generatorConfig.Colors {
+		color := c
+		check := widget.NewCheck("", func(checked bool) {
+			w.generatorConfig.Colors[color] = checked
+			w.regenerate()
+		})
+		check.SetChecked(w.generatorConfig.Colors[color])
+
+		colorFormItems = append(colorFormItems, widget.NewFormItem(colorLabel(color), check))
+	}
+
+	form := widget.NewForm(
+		widget.NewFormItem("Title", widget.NewLabel(w.edlList.Title)),
+		widget.NewFormItem("Frame Code Mode", widget.NewLabel(frameCodeModeLabel(w.edlList.FrameCodeMode))),
+		widget.NewFormItem("Timecode Format", widget.NewEntryWithData(w.bindString(&w.generatorConfig.TimeFormat))),
+	)
+
+	for _, color := range colorFormItems {
+		form.AppendItem(color)
+	}
+
+	return form
 }
 
 func (w *ViewerWindow) getCopyButton() *widget.Button {
@@ -168,6 +198,15 @@ func (w *ViewerWindow) regenerate() {
 
 func (w *ViewerWindow) bindString(v *string) binding.ExternalString {
 	b := binding.BindString(v)
+	b.AddListener(binding.NewDataListener(func() {
+		w.regenerate()
+	}))
+
+	return b
+}
+
+func (w *ViewerWindow) bindBool(v *bool) binding.ExternalBool {
+	b := binding.BindBool(v)
 	b.AddListener(binding.NewDataListener(func() {
 		w.regenerate()
 	}))

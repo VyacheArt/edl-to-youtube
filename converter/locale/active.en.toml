@@ -6,4 +6,15 @@ chooseFile = "Choose file"
 file = "File"
 open = "Open"
 openLast = "Open last"
+help = "Help"
 quit = "Quit"
+
+introductionLabel = "Introduction"
+
+helpHowTo = "How to..."
+helpDavinciExport = "Export EDL from DaVinci Resolve"
+
+resolveManualMediaStep = "1. Select your timeline in the Media Pool"
+resolveManualExportStep = "2. Right click on the timeline, then go Timelines -> Export -> Timeline Markers to EDL..."
+resolveManualSaveStep = "3. Choose a location and save the EDL file"
+resolveManualLastStep = "4. You are awesome! Open the EDL file in this app and convert it to YouTube timecodes"

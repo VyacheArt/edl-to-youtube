@@ -11,6 +11,29 @@ import (
 
 const DefaultLocale = "en"
 
+//goland:noinspection GoCommentStart
+const (
+	// Menu
+	MenuLanguage      = "language"
+	MenuChooseFile    = "chooseFile"
+	MenuFile          = "file"
+	MenuOpen          = "open"
+	MenuOpenLast      = "openLast"
+	MenuWelcomeScreen = "welcomeScreen"
+	MenuHelp          = "help"
+	MenuQuit          = "quit"
+
+	// Help
+	HelpHowTo           = "helpHowTo"
+	HelpExportInResolve = "helpDavinciExport"
+
+	// DaVinci Resolve Manual
+	ResolveManualMediaStep  = "resolveManualMediaStep"
+	ResolveManualExportStep = "resolveManualExportStep"
+	ResolveManualSaveStep   = "resolveManualSaveStep"
+	ResolveManualLastStep   = "resolveManualLastStep"
+)
+
 var (
 	bundle    = i18n.NewBundle(language.English)
 	localizer = i18n.NewLocalizer(bundle, DefaultLocale)

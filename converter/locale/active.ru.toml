@@ -6,4 +6,15 @@ chooseFile = "Выбрать файл"
 file = "Файл"
 open = "Открыть"
 openLast = "Открыть последний"
+help = "Помощь"
 quit = "Выход"
+
+introductionLabel = "Введение"
+
+helpHowTo = "Как..."
+helpDavinciExport = "Экспортировать EDL файл из DaVinci Resolve"
+
+resolveManualMediaStep = "1. Выберите Ваш таймлайн в Media Pool"
+resolveManualExportStep = "2. Кликните правой кнопкой мыши по таймлайну, затем перейдите по пути Timelines -> Export -> Timeline Markers to EDL..."
+resolveManualSaveStep = "3. Выберите путь и сохраните EDL файл"
+resolveManualLastStep = "4. Вы великолепны! Теперь откройте EDL файл и конвертируете его в YouTube таймкоды!"

@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/VyacheArt/edl-to-youtube/caption"
+	widget2 "github.com/VyacheArt/edl-to-youtube/converter/widget"
 	"github.com/VyacheArt/edl-to-youtube/edl"
 	"strconv"
 	"strings"
@@ -62,7 +63,6 @@ func (w *ViewerWindow) Show() {
 	w.window.CenterOnScreen()
 
 	w.window.SetContent(w.getContent())
-	w.window.SetMainMenu(GetMainMenu(w.app, w.window))
 	w.window.Show()
 
 	w.regenerate()
@@ -112,6 +112,8 @@ func (w *ViewerWindow) getForm() *widget.Form {
 		widget.NewFormItem("Title", widget.NewLabel(w.edlList.Title)),
 		widget.NewFormItem("Frame Code Mode", widget.NewLabel(frameCodeModeLabel(w.edlList.FrameCodeMode))),
 		widget.NewFormItem("Timecode Format", widget.NewEntryWithData(w.bindString(&w.generatorConfig.TimeFormat))),
+		widget.NewFormItem("Introduction Label", widget.NewEntryWithData(w.bindString(&w.generatorConfig.IntroductionLabel))),
+		widget.NewFormItem("Offset Seconds", widget2.NewNumericalEntryWithData(w.bindInt(&w.generatorConfig.OffsetSeconds))),
 	)
 
 	for _, color := range colorFormItems {
@@ -211,6 +213,15 @@ func (w *ViewerWindow) getColumnTitles(index int) string {
 // bindString is needed to make sure that caption will be regenerated when some field is changed
 func (w *ViewerWindow) bindString(v *string) binding.ExternalString {
 	b := binding.BindString(v)
+	b.AddListener(binding.NewDataListener(func() {
+		w.regenerate()
+	}))
+
+	return b
+}
+
+func (w *ViewerWindow) bindInt(v *int) binding.ExternalInt {
+	b := binding.BindInt(v)
 	b.AddListener(binding.NewDataListener(func() {
 		w.regenerate()
 	}))

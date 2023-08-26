@@ -17,8 +17,7 @@ const (
 const localeKey = "locale"
 
 type Application struct {
-	app    fyne.App
-	window fyne.Window
+	app fyne.App
 
 	mu         sync.Mutex
 	lastOpened []string
@@ -42,6 +41,16 @@ func (a *Application) Run() error {
 
 func (a *Application) getApp() fyne.App {
 	return a.app
+}
+
+func (a *Application) getCurrentWindow() fyne.Window {
+	windows := a.app.Driver().AllWindows()
+	if len(windows) == 0 {
+		return nil
+	}
+
+	last := windows[len(windows)-1]
+	return last
 }
 
 func (a *Application) loadLocale() {
@@ -77,6 +86,26 @@ func (a *Application) appendLastOpened(path string) {
 	a.lastOpened = append(a.lastOpened, path)
 	if len(a.lastOpened) > maxLastOpened {
 		a.lastOpened = a.lastOpened[1:]
+	}
+
+	rawJson, err := json.Marshal(a.lastOpened)
+	if err != nil {
+		log.Println("failed to save last opened files:", err)
+		return
+	}
+
+	a.app.Preferences().SetString(lastOpenedKey, string(rawJson))
+}
+
+func (a *Application) removeLastOpened(path string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	for i, p := range a.lastOpened {
+		if p == path {
+			a.lastOpened = append(a.lastOpened[:i], a.lastOpened[i+1:]...)
+			break
+		}
 	}
 
 	rawJson, err := json.Marshal(a.lastOpened)

@@ -7,13 +7,18 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func EnableProgress(c fyne.Canvas, op func(), text string) {
-	content := c.Content()
-	c.SetContent(widget.NewModalPopUp(GetProgressView(text), c))
+func EnableProgress(c []fyne.Canvas, op func(), text string) {
+	contents := make([]fyne.CanvasObject, len(c))
+	for i := range c {
+		contents[i] = c[i].Content()
+		c[i].SetContent(widget.NewModalPopUp(GetProgressView(text), c[i]))
+	}
 
 	op()
 
-	c.SetContent(content)
+	for i := range c {
+		c[i].SetContent(contents[i])
+	}
 }
 
 func GetProgressView(text string) fyne.CanvasObject {

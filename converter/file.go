@@ -13,7 +13,14 @@ import (
 
 func ChooseFile(app *Application, window fyne.Window) bool {
 	var path string
-	EnableProgress(window.Canvas(), func() {
+
+	windows := app.getApp().Driver().AllWindows()
+	canvases := make([]fyne.Canvas, len(windows))
+	for i, w := range windows {
+		canvases[i] = w.Canvas()
+	}
+
+	EnableProgress(canvases, func() {
 		path, _ = zenity.SelectFile(zenity.FileFilters{
 			{
 				Name:     "All files",
@@ -37,7 +44,18 @@ func OpenFile(app *Application, window fyne.Window, path string) bool {
 	log.Printf("File chosen, path: %s", path)
 
 	//get file size
-	if info, _ := os.Stat(path); info.Size() > MaxFileSize {
+	info, err := os.Stat(path)
+	if os.IsNotExist(err) {
+		dialog.ShowError(fmt.Errorf("file not found: %s", path), window)
+		return false
+	}
+
+	if err != nil {
+		dialog.ShowError(fmt.Errorf("unexpected error: %e", err), window)
+		return false
+	}
+
+	if info.Size() > MaxFileSize {
 		dialog.ShowError(fmt.Errorf("file size is too big, max size is %d bytes", MaxFileSize), window)
 		return false
 	}

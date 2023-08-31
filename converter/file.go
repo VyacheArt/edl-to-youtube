@@ -23,12 +23,8 @@ func ChooseFile(app *Application, window fyne.Window) bool {
 	EnableProgress(canvases, func() {
 		path, _ = zenity.SelectFile(zenity.FileFilters{
 			{
-				Name:     "All files",
-				Patterns: []string{"*"},
-			},
-			{
 				Name:     "EDL files",
-				Patterns: []string{"edl"},
+				Patterns: []string{"*.edl", "*.EDL"},
 			},
 		}, zenity.Modal())
 	}, "Choose EDL file")

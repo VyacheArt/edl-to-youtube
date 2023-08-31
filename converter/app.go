@@ -39,6 +39,10 @@ func (a *Application) Run() error {
 	return nil
 }
 
+func (a *Application) Quit() {
+	a.app.Quit()
+}
+
 func (a *Application) getApp() fyne.App {
 	return a.app
 }
@@ -51,6 +55,10 @@ func (a *Application) getCurrentWindow() fyne.Window {
 
 	last := windows[len(windows)-1]
 	return last
+}
+
+func (a *Application) getWindowCount() int {
+	return len(a.app.Driver().AllWindows())
 }
 
 func (a *Application) loadLocale() {

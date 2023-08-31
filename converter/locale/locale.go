@@ -24,14 +24,29 @@ const (
 	MenuQuit          = "quit"
 
 	// Help
-	HelpHowTo           = "helpHowTo"
-	HelpExportInResolve = "helpDavinciExport"
+	HelpHowTo                = "helpHowTo"
+	HelpExportInResolve      = "helpDavinciExport"
+	HelpUnavailableFile      = "helpUnavailableFile"
+	HelpUnavailableFileTitle = "helpUnavailableFileTitle"
 
 	// DaVinci Resolve Manual
 	ResolveManualMediaStep  = "resolveManualMediaStep"
 	ResolveManualExportStep = "resolveManualExportStep"
 	ResolveManualSaveStep   = "resolveManualSaveStep"
 	ResolveManualLastStep   = "resolveManualLastStep"
+
+	// Viewer
+	Title                  = "title"
+	TimecodeFormat         = "timecodeFormat"
+	IntroductionLabelTitle = "introductionLabelTitle"
+	OffsetSeconds          = "offsetSeconds"
+	Copy                   = "copy"
+	Copied                 = "copied"
+
+	ClipNumber = "clipNumber"
+	Timecode   = "timecode"
+	Color      = "color"
+	Marker     = "marker"
 )
 
 var (

@@ -18,3 +18,23 @@ resolveManualMediaStep = "1. Select your timeline in the Media Pool"
 resolveManualExportStep = "2. Right click on the timeline, then go Timelines -> Export -> Timeline Markers to EDL..."
 resolveManualSaveStep = "3. Choose a location and save the EDL file"
 resolveManualLastStep = "4. You are awesome! Open the EDL file in this app and convert it to YouTube timecodes"
+
+helpUnavailableFileTitle = "Why file is unavailable?"
+helpUnavailableFile = """
+There are two main reasons:
+1. File is really deleted
+2. The application can't access the file because of the AppStore restrictions.\n
+But don't worry, just open your file again using the "Open" button
+ (or click on the item and file dialog will appear automatically)."""
+
+title = "Title"
+timecodeFormat = "Timecode format"
+introductionLabelTitle = "Auto-Introduction title"
+offsetSeconds = "Offset (seconds)"
+copy = "Copy"
+copied = "Copied!"
+
+clipNumber = "Clip number"
+timecode = "Timecode"
+color = "Color"
+marker = "Marker"

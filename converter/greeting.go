@@ -9,17 +9,29 @@ import (
 	"fyne.io/fyne/v2/widget"
 	. "github.com/VyacheArt/edl-to-youtube/converter/locale"
 	widget2 "github.com/VyacheArt/edl-to-youtube/converter/widget"
+	"os"
+	"sync"
 )
 
-const MaxFileSize = 100 * 1024 * 1024 // 100 MB
+const MaxFileSize = 100 << 20 // 100 MB
 
-type GreetingWindow struct {
-	app    *Application
-	window fyne.Window
+type (
+	GreetingWindow struct {
+		app    *Application
+		window fyne.Window
 
-	lastOpened     []string
-	lastOpenedList *widget.List
-}
+		mu                  sync.Mutex
+		lastOpened          []*recentlyItem
+		lastOpenedList      *widget.List
+		chooseFileContainer *fyne.Container
+		splitContainer      *container.Split
+	}
+
+	recentlyItem struct {
+		Path        string
+		IsAvailable bool
+	}
+)
 
 func NewGreetingWindow(app *Application) *GreetingWindow {
 	return &GreetingWindow{
@@ -27,22 +39,52 @@ func NewGreetingWindow(app *Application) *GreetingWindow {
 	}
 }
 
+func newRecentlyItems(paths []string) []*recentlyItem {
+	items := make([]*recentlyItem, len(paths))
+	for i, path := range paths {
+		items[i] = newRecentlyItem(path)
+	}
+	return items
+}
+
+func newRecentlyItem(path string) *recentlyItem {
+	f, err := os.Open(path)
+	defer func() {
+		if f != nil {
+			_ = f.Close()
+		}
+	}()
+
+	return &recentlyItem{
+		Path:        path,
+		IsAvailable: err == nil,
+	}
+}
+
 func (w *GreetingWindow) Show() {
-	w.window = w.app.getApp().NewWindow(Title)
+	w.window = w.app.getApp().NewWindow(AppTitle)
 
 	w.window.Resize(fyne.NewSize(400, 300))
 	w.window.CenterOnScreen()
 	w.window.SetCloseIntercept(func() {
-		w.window.Hide()
+		if w.app.getWindowCount() > 1 {
+			w.window.Hide()
+		} else {
+			w.app.Quit()
+		}
 	})
 
-	w.lastOpened = w.app.getLastOpened()
-
-	w.initLastOpenedList()
+	w.initContent()
+	w.refreshMenu()
+	w.refreshContent()
 
 	w.window.SetContent(w.getContent())
-	w.window.SetMainMenu(w.getMainMenu())
+	w.window.Resize(fyne.NewSize(640, 480))
 	w.window.Show()
+}
+
+func (w *GreetingWindow) refreshMenu() {
+	w.window.SetMainMenu(w.getMainMenu())
 }
 
 func (w *GreetingWindow) getMainMenu() *fyne.MainMenu {
@@ -69,7 +111,7 @@ func (w *GreetingWindow) getMainMenu() *fyne.MainMenu {
 	return fyne.NewMainMenu(
 		fyne.NewMenu(Localize(MenuFile),
 			fyne.NewMenuItem(Localize(MenuOpen), func() {
-				ChooseFile(w.app, w.window)
+				w.onChooseFile()
 			}),
 			&fyne.MenuItem{
 				Label:     Localize(MenuOpenLast),
@@ -79,7 +121,7 @@ func (w *GreetingWindow) getMainMenu() *fyne.MainMenu {
 			fyne.NewMenuItemSeparator(),
 			fyne.NewMenuItem(Localize(MenuWelcomeScreen), func() {
 				w.window.Show()
-				w.refreshRecentlyList()
+				w.refreshContent()
 			}),
 			&fyne.MenuItem{
 				Label:     Localize(MenuLanguage),
@@ -104,34 +146,46 @@ func (w *GreetingWindow) getMainMenu() *fyne.MainMenu {
 	)
 }
 
-func (w *GreetingWindow) getContent() fyne.CanvasObject {
+func (w *GreetingWindow) initContent() {
 	const (
 		greetingTextKey = "greetingMessage"
 		chooseFileKey   = "chooseFile"
 	)
 
-	chooseFileContainer := container.New(layout.NewCenterLayout(),
+	w.initLastOpenedList()
+
+	w.chooseFileContainer = container.New(layout.NewCenterLayout(),
 		container.New(layout.NewVBoxLayout(),
-			widget.NewLabel(fmt.Sprintf(Localize(greetingTextKey), Title)),
+			widget.NewLabel(fmt.Sprintf(Localize(greetingTextKey), AppTitle)),
 			widget.NewButton(Localize(chooseFileKey), func() {
-				if ChooseFile(w.app, w.window) {
-					w.window.Close()
-				}
+				w.onChooseFile()
 			}),
 		),
 	)
 
+	w.splitContainer = container.NewVSplit(w.chooseFileContainer, w.lastOpenedList)
+	w.splitContainer.SetOffset(0.3)
+}
+
+func (w *GreetingWindow) refreshContent() {
+	w.refreshLastOpened()
+
+	w.window.SetContent(w.getContent())
+
+	w.chooseFileContainer.Refresh()
+	w.chooseFileContainer.Show()
+	w.lastOpenedList.Refresh()
+	w.lastOpenedList.UnselectAll()
+
+}
+
+func (w *GreetingWindow) getContent() fyne.CanvasObject {
 	lastOpened := w.app.getLastOpened()
 	if len(lastOpened) == 0 {
-		return chooseFileContainer
+		return w.chooseFileContainer
 	}
 
-	content := container.NewVSplit(chooseFileContainer, w.lastOpenedList)
-	content.SetOffset(0.3)
-
-	w.window.Resize(fyne.NewSize(640, 480))
-
-	return content
+	return w.splitContainer
 }
 
 func (w *GreetingWindow) initLastOpenedList() {
@@ -140,16 +194,25 @@ func (w *GreetingWindow) initLastOpenedList() {
 			return len(w.lastOpened)
 		},
 		func() fyne.CanvasObject {
-			return widget2.NewRecentlyItem(w.onRecentlyItemDeleted)
+			return widget2.NewRecentlyItem(w.onRecentlyItemDeleted, w.onRecentlyItemUnavailable)
 		},
 		func(i widget.ListItemID, o fyne.CanvasObject) {
-			o.(*widget2.RecentlyItem).SetPath(w.lastOpened[i])
+			ri := o.(*widget2.RecentlyItem)
+			ri.SetPath(w.lastOpened[i].Path)
+			ri.SetIsAvailable(w.lastOpened[i].IsAvailable)
 		},
 	)
 
 	fileList.OnSelected = func(id widget.ListItemID) {
-		if OpenFile(w.app, w.window, w.lastOpened[id]) {
-			w.window.Hide()
+		fileList.UnselectAll()
+
+		item := w.lastOpened[id]
+		if item.IsAvailable {
+			if OpenFile(w.app, w.window, w.lastOpened[id].Path) {
+				w.window.Hide()
+			}
+		} else {
+			w.onChooseFile()
 		}
 	}
 
@@ -158,11 +221,26 @@ func (w *GreetingWindow) initLastOpenedList() {
 
 func (w *GreetingWindow) onRecentlyItemDeleted(path string) {
 	w.app.removeLastOpened(path)
-	w.refreshRecentlyList()
+	w.refreshContent()
+	w.refreshMenu()
 }
 
-func (w *GreetingWindow) refreshRecentlyList() {
-	w.lastOpened = w.app.getLastOpened()
-	w.lastOpenedList.Refresh()
-	w.lastOpenedList.UnselectAll()
+func (w *GreetingWindow) onChooseFile() {
+	if ChooseFile(w.app, w.window) {
+		w.window.Hide()
+		w.refreshMenu()
+	}
+}
+
+func (w *GreetingWindow) onRecentlyItemUnavailable(path string) {
+	dialog.ShowInformation(Localize(HelpUnavailableFileTitle), Localize(HelpUnavailableFile), w.window)
+}
+
+func (w *GreetingWindow) refreshLastOpened() {
+	lastOpened := w.app.getLastOpened()
+
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	w.lastOpened = newRecentlyItems(lastOpened)
 }

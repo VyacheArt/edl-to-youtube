@@ -3,7 +3,7 @@ module github.com/VyacheArt/edl-to-youtube
 go 1.19
 
 require (
-	fyne.io/fyne/v2 v2.3.6-0.20230818193759-5bac179573ed
+	fyne.io/fyne/v2 v2.4.0-rc2
 	github.com/ncruces/zenity v0.10.10
 	github.com/nicksnyder/go-i18n/v2 v2.2.1
 	github.com/pelletier/go-toml/v2 v2.0.9

@@ -1,8 +1,8 @@
-Website = "https://edl.vyache.art"
+Website = "https://timecode.vyache.art"
 
 [Details]
   Icon = "Icon.png"
-  Name = "EDL to YouTube captions"
-  ID = "art.vyache.edl-to-youtube"
-  Version = "1.0.0"
-  Build = 4
+  Name = "Timecode Generator from EDL"
+  ID = "art.vyache.timecode"
+  Version = "1.1.3"
+  Build = 58

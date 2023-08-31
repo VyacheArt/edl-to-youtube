@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/VyacheArt/edl-to-youtube/caption"
+	"github.com/VyacheArt/edl-to-youtube/converter/locale"
 	widget2 "github.com/VyacheArt/edl-to-youtube/converter/widget"
 	"github.com/VyacheArt/edl-to-youtube/edl"
 	"strconv"
@@ -32,7 +33,7 @@ type ViewerWindow struct {
 	window  fyne.Window
 	edlList *edl.List
 
-	caption binding.String
+	caption *widget.Entry
 
 	generatorConfig caption.Config
 	generator       *caption.Generator
@@ -44,7 +45,6 @@ func NewViewerWindow(app *Application, edlList *edl.List) *ViewerWindow {
 		edlList:         edlList,
 		generator:       caption.NewGenerator(),
 		generatorConfig: caption.DefaultConfig(),
-		caption:         binding.NewString(),
 	}
 
 	window.fillColors()
@@ -69,9 +69,8 @@ func (w *ViewerWindow) Show() {
 }
 
 func (w *ViewerWindow) getContent() fyne.CanvasObject {
-	captionEntry := widget.NewMultiLineEntry()
-	captionEntry.TextStyle.Monospace = true
-	captionEntry.Bind(w.caption)
+	w.caption = widget.NewMultiLineEntry()
+	w.caption.TextStyle.Monospace = true
 
 	content := container.NewHSplit(
 		//left part with form and clips list
@@ -87,7 +86,7 @@ func (w *ViewerWindow) getContent() fyne.CanvasObject {
 				w.getRefreshButton(),
 				w.getCopyButton(),
 			),
-			nil, nil, captionEntry),
+			nil, nil, w.caption),
 	)
 
 	content.SetOffset(0.7)
@@ -109,11 +108,10 @@ func (w *ViewerWindow) getForm() *widget.Form {
 	}
 
 	form := widget.NewForm(
-		widget.NewFormItem("Title", widget.NewLabel(w.edlList.Title)),
-		widget.NewFormItem("Frame Code Mode", widget.NewLabel(frameCodeModeLabel(w.edlList.FrameCodeMode))),
-		widget.NewFormItem("Timecode Format", widget.NewEntryWithData(w.bindString(&w.generatorConfig.TimeFormat))),
-		widget.NewFormItem("Introduction Label", widget.NewEntryWithData(w.bindString(&w.generatorConfig.IntroductionLabel))),
-		widget.NewFormItem("Offset Seconds", widget2.NewNumericalEntryWithData(w.bindInt(&w.generatorConfig.OffsetSeconds))),
+		widget.NewFormItem(locale.Localize(locale.Title), widget.NewLabel(w.edlList.Title)),
+		widget.NewFormItem(locale.Localize(locale.TimecodeFormat), widget.NewEntryWithData(w.bindString(&w.generatorConfig.TimeFormat))),
+		widget.NewFormItem(locale.Localize(locale.IntroductionLabelTitle), widget.NewEntryWithData(w.bindString(&w.generatorConfig.IntroductionLabel))),
+		widget.NewFormItem(locale.Localize(locale.OffsetSeconds), widget2.NewNumericalEntryWithData(w.bindInt(&w.generatorConfig.OffsetSeconds))),
 	)
 
 	for _, color := range colorFormItems {
@@ -124,15 +122,12 @@ func (w *ViewerWindow) getForm() *widget.Form {
 }
 
 func (w *ViewerWindow) getCopyButton() *widget.Button {
-	const (
-		copyButtonText = "Copy"
-		textCopied     = "Copied!"
-	)
+	copyButtonText := locale.Localize(locale.Copy)
+	textCopied := locale.Localize(locale.Copied)
 
 	var copyButton *widget.Button
 	copyButton = widget.NewButton(copyButtonText, func() {
-		text, _ := w.caption.Get()
-		w.window.Clipboard().SetContent(text)
+		w.window.Clipboard().SetContent(w.caption.Text)
 		copyButton.SetText(textCopied)
 
 		go func() {
@@ -195,16 +190,16 @@ func (w *ViewerWindow) getTable() *widget.Table {
 func (w *ViewerWindow) getColumnTitles(index int) string {
 	switch index {
 	case clipNumberIndex:
-		return "Clip number"
+		return locale.Localize(locale.ClipNumber)
 
 	case recordInIndex:
-		return "Timecode"
+		return locale.Localize(locale.Timecode)
 
 	case colorIndex:
-		return "Color"
+		return locale.Localize(locale.Color)
 
 	case markerIndex:
-		return "Marker"
+		return locale.Localize(locale.Marker)
 	}
 
 	return ""
@@ -230,7 +225,8 @@ func (w *ViewerWindow) bindInt(v *int) binding.ExternalInt {
 }
 
 func (w *ViewerWindow) regenerate() {
-	_ = w.caption.Set(w.generator.Generate(w.generatorConfig, w.edlList))
+	w.caption.Text = w.generator.Generate(w.generatorConfig, w.edlList)
+	w.caption.Refresh()
 }
 
 func frameCodeModeLabel(mode edl.FrameCodeMode) string {

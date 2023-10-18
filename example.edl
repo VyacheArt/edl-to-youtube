@@ -2,41 +2,41 @@ TITLE: Timeline 1
 FCM: NON-DROP FRAME
 
 001  001      V     C        00:00:57:20 00:00:57:21 00:00:57:20 00:00:57:21
- |C:ResolveColorBlue |M:Установка |D:976
+ |C:ResolveColorBlue |M:Chapter 1 |D:976
 
 002  001      V     C        00:01:36:21 00:01:36:22 00:01:36:21 00:01:36:22
- |C:ResolveColorBlue |M:Подключение Prometheus |D:2000
+ |C:ResolveColorRed |M:Chapter 2 (Red) |D:2000
 
 003  001      V     C        00:02:56:21 00:02:56:22 00:02:56:21 00:02:56:22
- |C:ResolveColorBlue |M:Юниты или единицы измерения на графике |D:842
+ |C:ResolveColorBlue |M:Chapter 3 |D:842
 
 004  001      V     C        00:03:30:13 00:03:30:14 00:03:30:13 00:03:30:14
- |C:ResolveColorBlue |M:Выводим длительность обработки запросов |D:655
+ |C:ResolveColorBlue |M:Chapter 4 |D:655
 
 005  001      V     C        00:03:56:18 00:03:56:19 00:03:56:18 00:03:56:19
- |C:ResolveColorBlue |M:Выводим рейт запросов в виде State |D:830
+ |C:ResolveColorBlue |M:Chapter 5 |D:830
 
 006  001      V     C        00:04:29:23 00:04:29:24 00:04:29:23 00:04:29:24
- |C:ResolveColorBlue |M:Переменные в Grafana |D:2708
+ |C:ResolveColorRed |M:Chapter 6 (Red) |D:2708
 
 007  001      V     C        00:06:18:06 00:06:18:07 00:06:18:06 00:06:18:07
- |C:ResolveColorBlue |M:Аннотации в Grafana |D:1635
+ |C:ResolveColorRed |M:Chapter 7 (Red) |D:1635
 
 008  001      V     C        00:07:23:16 00:07:23:17 00:07:23:16 00:07:23:17
- |C:ResolveColorBlue |M:Подключение ClickHouse |D:1428
+ |C:ResolveColorBlue |M:Chapter 8 |D:1428
 
 009  001      V     C        00:08:20:19 00:08:20:20 00:08:20:19 00:08:20:20
- |C:ResolveColorBlue |M:Выводим данные из Clickhouse |D:1055
+ |C:ResolveColorBlue |M:Chapter 9 |D:1055
 
 010  001      V     C        00:09:02:24 00:09:03:00 00:09:02:24 00:09:03:00
- |C:ResolveColorBlue |M:Алертинг |D:2866
+ |C:ResolveColorPurple |M:Chapter 10 (Purple) |D:2866
 
 010  001      V     C        00:09:03:24 00:09:03:00 00:09:03:24 00:09:03:00
- |C:ResolveColorRed |M:Тестируем прогу |D:2866
+ |C:ResolveColorRed |M:Chapter 11 (Red) |D:2866
 
 011  001      V     C        00:10:57:18 00:10:57:19 00:10:57:18 00:10:57:19
- |C:ResolveColorBlue |M:Добавляем алерты на панель |D:4566
+ |C:ResolveColorBlue |M:Chapter 12 |D:4566
 
 012  001      V     C        00:14:00:09 00:14:00:10 00:14:00:09 00:14:00:10
- |C:ResolveColorBlue |M:Что ещё можно мониторить? |D:2002
+ |C:ResolveColorBlue |M:Chapter 13 |D:2002
 
